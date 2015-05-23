@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.test.dlapk">
+    package="com.mumuWeibo2">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -27,8 +27,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.mumuWeibo2.MumuWeibo">
-
+        <activity android:name="com.mumuWeibo2.MumuWeibo"
+            android:process=":weibo">
         </activity>
         <activity
             android:name="com.weibo.net.ShareActivity"
@@ -66,8 +66,10 @@
             android:process=":weibo">
 
         </activity>
-        <activity android:name="com.mumuWeibo2.MsgHolder"></activity>
-        <activity android:name="com.mumuWeibo2.BlockWords"></activity>
+        <activity android:name="com.mumuWeibo2.MsgHolder"
+            android:process=":weibo"></activity>
+        <activity android:name="com.mumuWeibo2.BlockWords"
+            android:process=":weibo"></activity>
         <activity
             android:name="com.mumuWeibo2.SplashScreen"
             android:process=":weibo"></activity>
