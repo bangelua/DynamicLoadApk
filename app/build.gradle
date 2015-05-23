@@ -5,7 +5,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "com.test.dlapk"
+        applicationId "com.mumuWeibo2"
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 1

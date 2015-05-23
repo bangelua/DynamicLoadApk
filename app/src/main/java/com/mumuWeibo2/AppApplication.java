@@ -1,4 +1,4 @@
-package com.test.dlapk;
+package com.mumuWeibo2;
 
 import android.app.ActivityManager;
 import android.app.Application;
