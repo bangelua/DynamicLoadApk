@@ -33,10 +33,12 @@ public class AppApplication extends Application {
     public static String getProcessName(Context context) {
         String myProcessName = null;
         int i = android.os.Process.myPid();
-        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context
+                .ACTIVITY_SERVICE);
         while (TextUtils.isEmpty(myProcessName)) {
 
-            List<ActivityManager.RunningAppProcessInfo> list = activityManager.getRunningAppProcesses();
+            List<ActivityManager.RunningAppProcessInfo> list = activityManager
+                    .getRunningAppProcesses();
             int j = list.size();
             int k = 0;
             while (k < j) {

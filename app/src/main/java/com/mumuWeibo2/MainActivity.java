@@ -3,8 +3,6 @@ package com.mumuWeibo2;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -22,7 +20,8 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.setClassName(MainActivity.this.getPackageName(), "com.mumuWeibo2.SplashScreen");
+                intent.setClassName(MainActivity.this.getPackageName(), "com.mumuWeibo2" +
+                        ".SplashScreen");
                 MainActivity.this.startActivity(intent);
 
             }

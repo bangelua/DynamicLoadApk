@@ -7,33 +7,36 @@ import java.lang.reflect.Field;
  */
 public class ReflectionUtils {
 
-    public static Field getField(Object classObject, String filedName) throws IllegalAccessException {
+    public static Field getField(Object classObject, String filedName) throws
+            IllegalAccessException {
         Field field = null;
         Class<?> tClass = classObject.getClass();
         while (field == null) {
             try {
-                field =  tClass.getDeclaredField(filedName);
+                field = tClass.getDeclaredField(filedName);
                 field.setAccessible(true);
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
                 if (tClass.getSuperclass() != null) {
                     tClass = tClass.getSuperclass();
-                }else{
+                } else {
                     break;
                 }
             }
         }
 
-     return   field;
+        return field;
     }
 
-    public static Object getFieldObject(Object classObject, String filedName) throws IllegalAccessException {
+    public static Object getFieldObject(Object classObject, String filedName) throws
+            IllegalAccessException {
         Field field = getField(classObject, filedName);
         return field.get(classObject);
     }
 
 
-    public static void setField(Object obj, String fieldName, Object value) throws IllegalAccessException {
+    public static void setField(Object obj, String fieldName, Object value) throws
+            IllegalAccessException {
         Field filed = getField(obj, fieldName);
         filed.set(obj, value);
     }

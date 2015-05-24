@@ -32,17 +32,19 @@ public class DynamicLoader {
     private Application mApplication;
 
 
-    public DynamicLoader(Context ctx, Application hostApplication, String apkName, String applicationName) {
+    public DynamicLoader(Context ctx, Application hostApplication, String apkName, String
+            applicationName) {
         Log.d(TAG, "DynamicLoader init");
         mContxt = ctx;
         mApplication = hostApplication;
+        mApkName = apkName;
         if (TextUtils.isEmpty(applicationName)) {
             mApplicationName = Application.class.getName(); //默认
         } else {
             mApplicationName = applicationName;
         }
         try {
-            init(apkName);
+            init();
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(TAG, "e:  " + e);
@@ -51,44 +53,48 @@ public class DynamicLoader {
 
     }
 
-    private void init(String apkName) throws IOException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException {
-        mApkName = apkName;
+    private void init() throws IOException, IllegalAccessException,
+            NoSuchMethodException, InvocationTargetException, InstantiationException,
+            ClassNotFoundException {
         initDexFile();
         initClassLoader();
         replaceFileds();
 
     }
 
-    private void replaceFileds() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, ClassNotFoundException, InstantiationException {
+    private void replaceFileds() throws IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException, ClassNotFoundException, InstantiationException {
         Object mPackageInfo = ReflectionUtils.getFieldObject(mContxt, "mPackageInfo");
         ReflectionUtils.setField(mPackageInfo, "mClassLoader", mClassLoader);
-        String resPath = new File(mContxt.getDir(DEXPATH, Context.MODE_PRIVATE), mApkName).getAbsolutePath();
+        String resPath = new File(mContxt.getDir(DEXPATH, Context.MODE_PRIVATE), mApkName)
+                .getAbsolutePath();
         ReflectionUtils.setField(mPackageInfo, "mResDir", resPath);
         ReflectionUtils.setField(mPackageInfo, "mResources", null);
 
         Object mActivityThread = ReflectionUtils.getFieldObject(mPackageInfo, "mActivityThread");
-        Method getResouces = mPackageInfo.getClass().getDeclaredMethod("getResources", mActivityThread.getClass());
-        Object res = getResouces.invoke(mPackageInfo, mActivityThread);
-        ReflectionUtils.setField(mApplication.getBaseContext(), "mResources", res);
+        Method getResouces = mPackageInfo.getClass().getDeclaredMethod("getResources",
+                mActivityThread.getClass());
+        /*Object res = */
+        getResouces.invoke(mPackageInfo, mActivityThread); //replace mResoures
+//        ReflectionUtils.setField(mApplication.getBaseContext(), "mResources", res);
 
         //application
-        Application appl = (Application) Class.forName(mApplicationName, true, mContxt.getClassLoader()).newInstance();
+        Application appl = (Application) Class.forName(mApplicationName, true, mClassLoader)
+                .newInstance(); //here, mContext.getClassLoader == mClassLoader
         ReflectionUtils.setField(mPackageInfo, "mApplication", appl);
         ReflectionUtils.setField(mApplication.getBaseContext(), "mOuterContext", appl);
         ReflectionUtils.setField(mActivityThread, "mInitialApplication", appl);
 
-        ArrayList<Application> appList = (ArrayList<Application>) ReflectionUtils.getFieldObject(mActivityThread, "mAllApplications");
+        ArrayList<Application> appList = (ArrayList<Application>) ReflectionUtils.getFieldObject
+                (mActivityThread, "mAllApplications");
         for (Application app : appList) {
             if (app == mApplication)
                 app = appl;
         }
-
-
         Method attachMethod = Application.class.getDeclaredMethod("attach", Context.class);
         attachMethod.setAccessible(true);
         attachMethod.invoke(appl, mApplication.getBaseContext());
         appl.onCreate();
-
     }
 
     private void initDexFile() throws IOException {
@@ -98,19 +104,19 @@ public class DynamicLoader {
     private void initClassLoader() {
         String dexPaths = null;
         File dexPath = mContxt.getDir(DEXPATH, Context.MODE_PRIVATE);
-        File[] fileArray = dexPath.listFiles();
-        for (File apk : fileArray) {
-            if (TextUtils.isEmpty(dexPaths)) {
-                dexPaths = apk.getAbsolutePath();
-            } else {
-                dexPaths += File.pathSeparator + apk.getAbsolutePath();
-            }
+        File dexApk = new File(dexPath, mApkName);
 
+        if (TextUtils.isEmpty(dexPaths)) {
+            dexPaths = dexApk.getAbsolutePath();
+        } else {
+            dexPaths += File.pathSeparator + dexApk.getAbsolutePath();
         }
+
         Log.d(TAG, "dexPaths: " + dexPaths);
 
         File odexPath = mContxt.getDir(ODEX_PATH, Context.MODE_PRIVATE);
-        mClassLoader = new DexClassLoader(dexPaths, odexPath.getAbsolutePath(), null, mContxt.getClassLoader());
+        mClassLoader = new DexClassLoader(dexPaths, odexPath.getAbsolutePath(), null, mContxt
+                .getClassLoader());
         Log.d(TAG, "mClassLoader: " + mClassLoader);
 
     }
